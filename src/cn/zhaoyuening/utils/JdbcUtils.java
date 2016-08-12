@@ -20,11 +20,11 @@ import java.util.ResourceBundle;
  * password=xxxx<br>
  */
 public class JdbcUtils {
-	private static Connection conn = null;
 	private static String url;
 	private static String username;
 	private static String password;
 	private static String driver;
+	private static final ThreadLocal<Connection> tl = new ThreadLocal<Connection>();
 	static{
 		//获取jdbc配置
 		ResourceBundle bundle = ResourceBundle.getBundle("jdbc");
@@ -46,6 +46,7 @@ public class JdbcUtils {
 	 * @return 与数据库的链接对象 
 	 */
 	public static Connection getConnection(){
+		Connection conn = tl.get();
 		try{
 			if(conn==null||conn.isClosed()){
 				conn = DriverManager.getConnection(url, username, password);
@@ -62,6 +63,7 @@ public class JdbcUtils {
 	 * 关闭与数据库的连接
 	 */
 	public static void closeConnection(){
+		Connection conn = tl.get();
 		try {
 			if(conn==null){
 				return ;

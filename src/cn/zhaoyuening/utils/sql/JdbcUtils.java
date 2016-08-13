@@ -1,5 +1,6 @@
 package cn.zhaoyuening.utils.sql;
 
+import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,6 +11,8 @@ import java.util.ResourceBundle;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 /**
  * <b>jdbc开发工具类</b><br>
  * 快速链接数据库
@@ -95,15 +98,19 @@ public class JdbcUtils {
 	}
 	
 	/**
-	 * 得到数据库连接池
+	 * 得到数据库连接池(c3p0)
 	 * @return 数据库连接池
 	 */
 	public static DataSource getDataSource(){
-		BasicDataSource ds = new BasicDataSource();
-		ds.setDriverClassName(driver);
-		ds.setUsername(username);
+		ComboPooledDataSource ds = new ComboPooledDataSource();
+		try {
+			ds.setDriverClass(driver);
+		} catch (PropertyVetoException e) {
+			return null;
+		}
+		ds.setUser(username);
 		ds.setPassword(password);
-		ds.setUrl(url);
+		ds.setJdbcUrl(url);
 		return ds;
 	}
 }

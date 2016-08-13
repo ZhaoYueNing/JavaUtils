@@ -1,4 +1,4 @@
-package cn.zhaoyuening.utils;
+package cn.zhaoyuening.utils.sql;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -6,6 +6,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ResourceBundle;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.dbcp.BasicDataSource;
 /**
  * <b>jdbc开发工具类</b><br>
  * 快速链接数据库
@@ -45,7 +49,7 @@ public class JdbcUtils {
 	 * 每一个线程，保存一个connection对象
 	 * @return 与数据库的链接对象 
 	 */
-	public static Connection getConnection(){
+	public static Connection getConnectionInThread(){
 		Connection conn = tl.get();
 		try{
 			if(conn==null||conn.isClosed()){
@@ -58,6 +62,21 @@ public class JdbcUtils {
 		return null;
 	}
 	
+	/**
+	 * 创建一个新的连接对象
+	 * 与线程无关
+	 * @return 连接对象
+	 */
+	public static Connection getConnection(){
+		Connection conn = null;
+		try{
+			conn = DriverManager.getConnection(url, username, password);
+			return conn;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 	/**
 	 * 关闭与数据库的连接
@@ -73,5 +92,18 @@ public class JdbcUtils {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * 得到数据库连接池
+	 * @return 数据库连接池
+	 */
+	public static DataSource getDataSource(){
+		BasicDataSource ds = new BasicDataSource();
+		ds.setDriverClassName(driver);
+		ds.setUsername(username);
+		ds.setPassword(password);
+		ds.setUrl(url);
+		return ds;
 	}
 }
